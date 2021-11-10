@@ -24,24 +24,25 @@ export function useEnemy() {
       ? config.enemy.speed()
       : config.enemy.speed;
   };
-
-  const enemys = reactive([
-    {
+  const createEnemy = () => {
+    const width = 308;
+    const height = 207;
+    return {
       x: 100,
       y: 100,
       speed: getSpeed(),
-    },
-    {
-      x: 150,
-      y: 150,
-      speed: getSpeed(),
-    },
-  ]);
+      width,
+      height,
+    };
+  };
+
+  const enemys = reactive([createEnemy()]);
 
   const destory = (index) => {
     enemys.splice(index, 1);
   };
   // 敌方飞机移动逻辑
+  // eslint-disable-next-line no-unused-vars
   const move = () => {
     const handleTicker = () => {
       enemys.forEach((enemy, index) => {
@@ -60,10 +61,11 @@ export function useEnemy() {
     });
   };
 
-  move();
+//   move();
 
   return {
     enemys,
+    destory
   };
 }
 </script>

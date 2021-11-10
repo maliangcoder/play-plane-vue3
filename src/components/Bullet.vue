@@ -19,8 +19,23 @@ export default {
 export function useBullet() {
   const bullets = reactive([]);
 
+  const creatBullet = ({x,y}) =>{
+    const width = 61;
+    const height = 99;
+    return {
+      x,
+      y,
+      width,
+      height
+    }
+  }
+
+  const destoryBullet = (index) =>{
+    bullets.splice(index,1)
+  }
+
   const addBullet = ({ x, y }) => {
-    bullets.push({ x, y });
+    bullets.push(creatBullet({x,y}));
   };
 
   // 我方飞机发射子弹移动逻辑
@@ -30,7 +45,7 @@ export function useBullet() {
         bullet.y -= config.bullet.speed;
 
         if(bullet.y < -200){
-          bullets.splice(index,1)
+          destoryBullet(index)
         }
       });
     }
@@ -47,6 +62,7 @@ export function useBullet() {
   return {
     bullets,
     addBullet,
+    destoryBullet
   };
 }
 </script>
