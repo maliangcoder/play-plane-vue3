@@ -1,52 +1,75 @@
 <template>
   <container>
-    <sprite :texture="planeImg" :y="plane.y" :x="plane.x"></sprite>
+    <sprite :texture="planeImg"></sprite>
   </container>
 </template>
 
 <script>
-import { onMounted, onUnmounted, reactive } from "@vue/runtime-core";
+import { onMounted, onUnmounted, reactive } from "vue";
 import planeImg from "../assets/plane.png";
 export default {
-    
   setup() {
-    const { plane } = useMove();
     return {
       planeImg,
-      plane,
     };
   },
 };
-function useMove() {
-  const plane = reactive({
+
+export function usePlane({ onAttack }) {
+  let planeInfo = reactive({
     x: 100,
     y: 600,
   });
-  const speed = 10;
-  const handleTicker = (e) => {
-    switch (e.code) {
-      case "ArrowUp":
-        plane.y -= speed;
-        break;
-      case "ArrowDown":
-        plane.y += speed;
-        break;
-      case "ArrowLeft":
-        plane.x -= speed;
-        break;
-      case "ArrowRight":
-        plane.x += speed;
-        break;
-    }
+  const move = () => {
+    const speed = 10;
+    const handleMove = (e) => {
+      switch (e.code) {
+        case "ArrowUp":
+          planeInfo.y -= speed;
+          break;
+        case "ArrowDown":
+          planeInfo.y += speed;
+          break;
+        case "ArrowLeft":
+          planeInfo.x -= speed;
+          break;
+        case "ArrowRight":
+          planeInfo.x += speed;
+          break;
+      }
+    };
+    onMounted(() => {
+      window.addEventListener("keyup", handleMove);
+    });
+    onUnmounted(() => {
+      window.removeEventListener("keyup", handleMove);
+    });
   };
-  onMounted(() => {
-    window.addEventListener("keyup", handleTicker);
-  });
-  onUnmounted(() => {
-    window.removeEventListener("keyup", handleTicker);
-  });
+  move();
+
+  const attack = () => {
+    const handleAttack = (e) => {
+      console.log(e.code);
+      if (e.code === "Space") {
+        console.log("attack");
+        onAttack &&
+          onAttack({
+            x: planeInfo.x + 100,
+            y: planeInfo.y - 50,
+          });
+      }
+    };
+    onMounted(() => {
+      window.addEventListener("keyup", handleAttack);
+    });
+    onUnmounted(() => {
+      window.removeEventListener("keyup", handleAttack);
+    });
+  };
+  attack();
+
   return {
-    plane,
+    planeInfo,
   };
 }
 </script>

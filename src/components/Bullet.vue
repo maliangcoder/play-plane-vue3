@@ -1,55 +1,54 @@
 <template>
   <container>
-    <sprite
-      v-for="(bullet, index) in bullets"
-      :key="index"
-      :texture="bulletImg"
-      :x="bullet.x"
-      :y="bullet.y"
-    ></sprite>
+    <sprite :texture="bulletImg"></sprite>
   </container>
 </template>
 
 <script>
-import { reactive } from "@vue/reactivity";
 import bulletImg from "../assets/bullet.png";
-import { onMounted, onUnmounted } from '@vue/runtime-core';
+import { onMounted, onUnmounted, reactive } from "vue";
+import {game} from '../game'
+import config from '../config'
 export default {
   setup() {
-    const bullets = reactive([
-      {
-        x: 100,
-        y: 100,
-      },
-      {
-        x: 150,
-        y: 150,
-      },
-    ]);
-    const handleBullet = (e) =>{
-        console.log(e.code)
-        // if(e.code === 'Space'){
-        //     bullets.push({
-        //         x:210++,
-        //         y:510++
-        //     })
-        // }
-    }
-
-    onMounted(() =>{
-        window.addEventListener('keyup',handleBullet)
-    })
-    onUnmounted(() =>{
-        window.removeEventListener('keyup',handleBullet)
-    })
-    
-
     return {
       bulletImg,
-      bullets,
     };
   },
 };
+export function useBullet() {
+  const bullets = reactive([]);
+
+  const addBullet = ({ x, y }) => {
+    bullets.push({ x, y });
+  };
+
+  // 我方飞机发射子弹移动逻辑
+  const move = () =>{
+    const handleTicker = () =>{
+      bullets.forEach((bullet,index) => {
+        bullet.y -= config.bullet.speed;
+
+        if(bullet.y < -200){
+          bullets.splice(index,1)
+        }
+      });
+    }
+    onMounted(() => {
+      game.ticker.add(handleTicker)
+    })
+    onUnmounted(() => {
+      game.ticker.remove(handleTicker)
+    })
+  }
+
+  move();
+
+  return {
+    bullets,
+    addBullet,
+  };
+}
 </script>
 
 <style>
